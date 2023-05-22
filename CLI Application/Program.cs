@@ -17,6 +17,7 @@ while (!exit)
     Console.WriteLine("8. Exit the program");
 
     Console.Write("Enter your choice: ");
+
     string choice = Console.ReadLine();
 
     switch (choice)
