@@ -1,144 +1,161 @@
-﻿
-Console.WriteLine("Welcome to the Command-Line Shell Application!");
+﻿using CommandLine.Text;
+using CommandLine;
+using CLI_Application;
 
-string currentDirectory = Directory.GetCurrentDirectory();
-bool exit = false;
-
-while (!exit)
+void RunOptions(Options options)
 {
-    Console.WriteLine("\nWhat would you like to do today?");
-    Console.WriteLine("1. Navigate directories (cd)");
-    Console.WriteLine("2. List files and directories (ls)");
-    Console.WriteLine("3. Display file contents (cat)");
-    Console.WriteLine("4. Remove a file (rm)");
-    Console.WriteLine("5. Create a file (touch)");
-    Console.WriteLine("6. Copy a file (cp)");
-    Console.WriteLine("7. Create a directory (mkdir)");
-    Console.WriteLine("8. Exit the program");
+    Console.WriteLine("Welcome to the Command-Line Shell Application!");
+    string currentDirectory = Directory.GetCurrentDirectory();
 
-    Console.Write("Enter your choice: ");
-
-    string choice = Console.ReadLine();
-
-    switch (choice)
+    if (options.cd is not null)
     {
-        case "1":
-            Console.Write("Enter the directory path: ");
-            string path = Console.ReadLine();
-            if (Directory.Exists(path))
-            {
-                currentDirectory = Path.GetFullPath(path);
-                Console.WriteLine($"Current directory changed to: {currentDirectory}");
-            }
-            else
-            {
-                Console.WriteLine("Directory does not exist.");
-            }
-            break;
+        //Directory.Exists(options.cd);
+    }
 
-        case "2":
-            string[] files = Directory.GetFiles(currentDirectory);
-            string[] directories = Directory.GetDirectories(currentDirectory);
+    else if (options.ls)
+    {
+        var filesAndFolders = CommandPrompt.ListFiles(currentDirectory);
 
-            Console.WriteLine("Files:");
-            foreach (string file in files)
-            {
-                Console.WriteLine(Path.GetFileName(file));
-            }
+        Console.WriteLine("Files:");
+        foreach (string file in filesAndFolders.files)
+        {
+            Console.WriteLine(file);
+        }
 
-            Console.WriteLine("\nDirectories:");
-            foreach (string directory in directories)
-            {
-                Console.WriteLine(Path.GetFileName(directory));
-            }
-            break;
+        Console.WriteLine("\nDirectories:");
+        foreach (string folder in filesAndFolders.folders)
+        {
+            Console.WriteLine(folder);
+        }
+    }
 
-        case "3":
-            Console.Write("Enter the filename: ");
-            string fileName = Console.ReadLine();
-            string filePath = Path.Combine(currentDirectory, fileName);
-            if (File.Exists(filePath))
-            {
-                string fileContent = File.ReadAllText(filePath);
-                Console.WriteLine(fileContent);
-            }
-            else
-            {
-                Console.WriteLine("File not found.");
-            }
-            break;
+    else if (options.cat is not null)
+    {
+        string filePath = Path.Combine(currentDirectory, options.cat);
+        string fileContent = CommandPrompt.ReadFile(filePath);
+        if (!String.IsNullOrEmpty(fileContent))
+        {
+            Console.WriteLine(fileContent);
+        }
+        else
+        {
+            Console.WriteLine("File not found.");
+        }
+    }
 
-        case "4":
-            Console.Write("Enter the filename: ");
-            fileName = Console.ReadLine();
-            filePath = Path.Combine(currentDirectory, fileName);
-            if (File.Exists(filePath))
-            {
-                File.Delete(filePath);
-                Console.WriteLine($"File deleted: {fileName}");
-            }
-            else
-            {
-                Console.WriteLine("File not found.");
-            }
-            break;
+    else if (options.rm is not null)
+    {
+        string filePath = Path.Combine(currentDirectory, options.rm);
+        if (CommandPrompt.RemoveFile(filePath))
+        {
+            Console.WriteLine($"File deleted: {options.rm}");
+        }
+        else
+        {
+            Console.WriteLine("File not found.");
+        }
+    }
 
-        case "5":
-            Console.Write("Enter the filename: ");
-            fileName = Console.ReadLine();
-            filePath = Path.Combine(currentDirectory, fileName);
-            if (!File.Exists(filePath))
-            {
-                File.Create(filePath).Close();
-                Console.WriteLine($"File created: {fileName}");
-            }
-            else
-            {
-                Console.WriteLine("File already exists.");
-            }
-            break;
+    else if (options.touch is not null)
+    {
+        string filePath = Path.Combine(currentDirectory, options.touch);
+        if (CommandPrompt.CreateFile(filePath))
+        {
+            Console.WriteLine($"File created: {options.touch}");
+        }
+        else
+        {
+            Console.WriteLine("File already exists.");
+        }
+    }
 
-        case "6":
-            Console.Write("Enter the source filename: ");
-            string sourceFileName = Console.ReadLine();
-            Console.Write("Enter the destination filename: ");
-            string destinationFileName = Console.ReadLine();
-            string sourceFilePath = Path.Combine(currentDirectory, sourceFileName);
-            string destinationFilePath = Path.Combine(currentDirectory, destinationFileName);
-            if (File.Exists(sourceFilePath))
-            {
-                File.Copy(sourceFilePath, destinationFilePath);
-                Console.WriteLine($"File copied: {destinationFileName}");
-            }
-            else
-            {
-                Console.WriteLine("Source file not found.");
-            }
-            break;
+    else if (options.cp is not null && options.cp.Count() == 2)
+    {
+        string sourceFilePath = Path.Combine(currentDirectory, options.cp.ElementAt(0));
+        string destinationFilePath = Path.Combine(currentDirectory, options.cp.ElementAt(1));
 
-        case "7":
-            Console.Write("Enter the directory name: ");
-            string directoryName = Console.ReadLine();
-            string directoryPath = Path.Combine(currentDirectory, directoryName);
-            if (!Directory.Exists(directoryPath))
-            {
-                Directory.CreateDirectory(directoryPath);
-                Console.WriteLine($"Directory created: {directoryName}");
-            }
-            else
-            {
-                Console.WriteLine("Directory already exists.");
-            }
-            break;
+        if (CommandPrompt.CopyFile(sourceFilePath, destinationFilePath))
+        {
+            Console.WriteLine($"File copied: {options.cp.ElementAt(0)}");
+        }
+        else
+        {
+            Console.WriteLine("Source file not found.");
+        }
+    }
 
-        case "8":
-            exit = true;
-            break;
-
-        default:
-            Console.WriteLine("Invalid choice. Please try again.");
-            break;
+    else if (options.mkdir is not null)
+    {
+        string directoryName = options.mkdir;
+        string directoryPath = Path.Combine(currentDirectory, directoryName);
+        if (CommandPrompt.CreateDirectory(directoryPath))
+        {
+            Console.WriteLine($"Directory created: {directoryName}");
+        }
+        else
+        {
+            Console.WriteLine("Directory already exists.");
+        }
     }
 }
 
+void GrepOptions(GrepOptions options)
+{
+    string currentDirectory = Directory.GetCurrentDirectory();
+    FSGrep.Recursive = options.reccursive;
+    var results = FSGrep.GetMatchingFiles(options.FileSearchLinePattern, options.FileSearchMask, currentDirectory);
+    foreach (var result in results)
+    {
+        Console.WriteLine(result);
+    }
+}
+void HandleParseError(IEnumerable<Error> errs)
+{
+    //handle errors
+}
+Parser.Default.ParseArguments<Options, GrepOptions>(new[] { "grep", "-r", "ABCD", "*" })
+     .WithParsed<Options>(RunOptions)
+     .WithParsed<GrepOptions>(GrepOptions)
+     .WithNotParsed(HandleParseError);
+
 Console.WriteLine("Thank you for using the Command-Line Shell Application!");
+
+[Verb("options", isDefault: true, HelpText = "Generic Options")]
+class Options
+{
+    [Option(HelpText = "Change directory to", Required = true, SetName = "cd")]
+    public string cd { get; set; }
+
+
+    [Option(HelpText = "list files in directory", Required = true, SetName = "ls")]
+    public bool ls { get; set; }
+
+    [Option(HelpText = "Display file contents in <path>", Required = true, SetName = "cat")]
+    public string cat { get; set; }
+
+    [Option(HelpText = "Remove a file in <path>", Required = true, SetName = "rm")]
+    public string rm { get; set; }
+
+    [Option(HelpText = "Create a file in <path>", Required = true, SetName = "touch")]
+    public string touch { get; set; }
+
+    [Option(HelpText = "Copy a file from <path> to <path>", Min = 2, Max = 2, Required = true, SetName = "cp")]
+    public IEnumerable<string> cp { get; set; }
+
+    [Option(HelpText = "Create a directory named <path>", Required = true, SetName = "mkdir")]
+    public string mkdir { get; set; }
+}
+
+[Verb("grep", HelpText = "for searching plain-text data sets for lines that match a regular expression")]
+class GrepOptions
+{
+    [Option('r', HelpText = "run recurssively", SetName = "r", Default = false)]
+    public bool reccursive { get; set; }
+
+    [Value(0, Required = true, HelpText = "File Search Line Pattern")]
+    public string FileSearchLinePattern { get; set; }
+
+    [Value(1, Required = true, HelpText = "File Search Mask")]
+    public string FileSearchMask { get; set; }
+
+}
