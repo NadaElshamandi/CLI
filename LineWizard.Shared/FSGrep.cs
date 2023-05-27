@@ -1,3 +1,5 @@
+namespace LineWizard.Shared;
+
 public static class FSGrep
 {
     public static bool Recursive { get; set; } = false;

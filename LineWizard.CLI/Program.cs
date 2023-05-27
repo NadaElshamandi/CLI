@@ -1,7 +1,7 @@
 ﻿using CommandLine.Text;
 using CommandLine;
-using CLI_Application;
 using System;
+using LineWizard.Shared;
 
 void RunOptions(Options options)
 {
