@@ -1,10 +1,10 @@
 ﻿using CommandLine.Text;
 using CommandLine;
 using CLI_Application;
+using System;
 
 void RunOptions(Options options)
 {
-    Console.WriteLine("Welcome to the Command-Line Shell Application!");
     string currentDirectory = Directory.GetCurrentDirectory();
 
     if (options.cd is not null)
@@ -97,6 +97,14 @@ void RunOptions(Options options)
             Console.WriteLine("Directory already exists.");
         }
     }
+
+    else if (options.echo is not null)
+    {
+        foreach (var value in options.echo)
+        {
+            Console.WriteLine(value);
+        }
+    }
 }
 
 void GrepOptions(GrepOptions options)
@@ -113,12 +121,11 @@ void HandleParseError(IEnumerable<Error> errs)
 {
     //handle errors
 }
-Parser.Default.ParseArguments<Options, GrepOptions>(new[] { "grep", "-r", "ABCD", "*" })
+Parser.Default.ParseArguments<Options, GrepOptions>(args)
      .WithParsed<Options>(RunOptions)
      .WithParsed<GrepOptions>(GrepOptions)
      .WithNotParsed(HandleParseError);
 
-Console.WriteLine("Thank you for using the Command-Line Shell Application!");
 
 [Verb("options", isDefault: true, HelpText = "Generic Options")]
 class Options
@@ -144,6 +151,9 @@ class Options
 
     [Option(HelpText = "Create a directory named <path>", Required = true, SetName = "mkdir")]
     public string mkdir { get; set; }
+
+    [Option(HelpText = "Display status text of the <path>", Required = true, SetName = "echo")]
+    public IEnumerable<string> echo { get; set; }
 }
 
 [Verb("grep", HelpText = "for searching plain-text data sets for lines that match a regular expression")]
