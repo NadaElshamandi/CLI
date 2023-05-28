@@ -1,4 +1,7 @@
 ﻿@using LineWizard.Shared
+@page "/filecontent/{filePath}"
+@using System.IO
+
 <MudTreeView T="TreeItemData" ServerData="async (a) => await LoadFolderData(a)" Hover="true" Items="TreeItems" Width="100%">
 	<ItemTemplate Context="item">
 		<MudTreeViewItem Items="@item.TreeItems" Icon="@item.Icon" LoadingIconColor="Color.Info" CanExpand="@item.CanExpand">
@@ -6,8 +9,8 @@
 				<div style="display: grid; grid-template-columns: 1fr auto; align-items: center; width: 100%">
 					<MudText Style="justify-self: start;">@item.Text</MudText>
 					<div style="justify-self: end;">
-						<MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Medium" Color="Color.Inherit" />
-						<MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Medium" Color="Color.Inherit" />
+						<MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Medium" Color="Color.Inherit" @onclick="async () => await DeleteItem(item)" />
+						<MudFab Color="Color.Inherit" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" />
 					</div>
 				</div>
 			</BodyContent>
@@ -15,32 +18,39 @@
 	</ItemTemplate>
 </MudTreeView>
 
-
 @code {
 
-	private HashSet<TreeItemData> TreeItems { get; set; } = new HashSet<TreeItemData>();
+    private HashSet<TreeItemData> TreeItems { get; set; } = new HashSet<TreeItemData>();
 
-	public class TreeItemData
-	{
-		public string Text { get; set; }
+    public class TreeItemData
+    {
+        public string Text { get; set; }
 
-		public string Icon { get; set; }
+        public string Icon { get; set; }
 
-		public bool CanExpand { get; set; } = true;
+        public bool CanExpand { get; set; } = false;
 
-		public HashSet<TreeItemData> TreeItems { get; set; } = new HashSet<TreeItemData>();
 
-		public TreeItemData(string text, string icon, bool canExpand = true)
-		{
-			Text = text;
-			Icon = icon;
-			CanExpand = canExpand;
-		}
-	}
+        public HashSet<TreeItemData> TreeItems { get; set; } = new HashSet<TreeItemData>();
 
-	protected override void OnInitialized()
-	{
+        public TreeItemData(string text, string icon, bool canExpand = false)
+        {
+            Text = text;
+            Icon = icon;
+            CanExpand = canExpand;
+        }
+    }
+
+    // Navigate to the component that displays the file content
+
+    protected override void OnInitialized()
+    {
 		var filesAndFolders = CommandPrompt.ListFiles(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+		var srcFolder = TreeItems.FirstOrDefault(ti => ti.Text == "src");
+		if (srcFolder != null)
+		{
+			srcFolder.TreeItems.Add(new TreeItemData("NewFolder", Icons.Material.Filled.Folder));
+		}
 
 		foreach (var folder in filesAndFolders.folders)
 		{
@@ -50,35 +60,22 @@
 		{
 			TreeItems.Add(new TreeItemData(file, Icons.Custom.FileFormats.FileDocument));
 		}
+	}
 
-		TreeItems.Add(new TreeItemData(".github", Icons.Custom.Brands.GitHub));
-		TreeItems.Add(new TreeItemData(".vscode", Icons.Custom.Brands.MicrosoftVisualStudio));
-		TreeItems.Add(new TreeItemData("content", Icons.Custom.FileFormats.FileDocument));
-		TreeItems.Add(new TreeItemData("src", Icons.Custom.FileFormats.FileCode)
-			{
-				TreeItems = new HashSet<TreeItemData>()
-			{
-				new TreeItemData("MudBlazor", Icons.Custom.Brands.MudBlazor),
-				new TreeItemData("MudBlazor.Docs", Icons.Custom.FileFormats.FileDocument)
-				{
-					TreeItems = new HashSet<TreeItemData>()
-					{
-						new TreeItemData("_Imports.razor", Icons.Material.Filled.AlternateEmail),
-						new TreeItemData( "compilerconfig.json", Icons.Custom.FileFormats.FileImage),
-						new TreeItemData( "MudBlazor.Docs.csproj", Icons.Custom.Brands.MicrosoftVisualStudio),
-						new TreeItemData("NewFilesToBuild.txt" , Icons.Custom.FileFormats.FileDocument),
-					}
-				},
-				new TreeItemData("MudBlazor.Docs.Client", Icons.Material.Filled.Folder),
-				new TreeItemData("MudBlazor.Docs.Compiler", Icons.Material.Filled.Folder),
-				new TreeItemData("MudBlazor.Docs.Server", Icons.Material.Filled.Folder),
-				new TreeItemData("MudBlazor.UnitTests", Icons.Material.Filled.Folder),
-				new TreeItemData("MudBlazor.UnitTests.Viewer", Icons.Material.Filled.Folder),
-				new TreeItemData(".editorconfig", Icons.Custom.FileFormats.FileCode),
-				new TreeItemData("MudBlazor.sln", Icons.Custom.Brands.MicrosoftVisualStudio)
-			}
-			});
-		TreeItems.Add(new TreeItemData("History", Icons.Material.Filled.Folder));
+	private async Task DeleteItem(TreeItemData item)
+	{
+		if (item.Icon == Icons.Material.Filled.Folder)
+		{
+			// delete folder
+			Directory.Delete(item.Text, true);
+		}
+		else
+		{
+			// delete file
+			File.Delete(item.Text);
+		}
+		TreeItems.Remove(item);
+		await InvokeAsync(StateHasChanged);
 	}
 
 	public async Task<HashSet<TreeItemData>> LoadFolderData(TreeItemData parentNode)
