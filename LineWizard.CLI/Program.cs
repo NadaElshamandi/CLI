@@ -7,12 +7,7 @@ void RunOptions(Options options)
 {
     string currentDirectory = Directory.GetCurrentDirectory();
 
-    if (options.cd is not null)
-    {
-        //Directory.Exists(options.cd);
-    }
-
-    else if (options.ls)
+    if (options.ls)
     {
         var filesAndFolders = CommandPrompt.ListFiles(currentDirectory);
 
@@ -110,7 +105,7 @@ void RunOptions(Options options)
 void GrepOptions(GrepOptions options)
 {
     string currentDirectory = Directory.GetCurrentDirectory();
-    FSGrep.Recursive = options.reccursive;
+    FSGrep.Recursive = options.recursive;
     var results = FSGrep.GetMatchingFiles(options.FileSearchLinePattern, options.FileSearchMask, currentDirectory);
     foreach (var result in results)
     {
@@ -130,10 +125,6 @@ Parser.Default.ParseArguments<Options, GrepOptions>(args)
 [Verb("options", isDefault: true, HelpText = "Generic Options")]
 class Options
 {
-    [Option(HelpText = "Change directory to", Required = true, SetName = "cd")]
-    public string cd { get; set; }
-
-
     [Option(HelpText = "list files in directory", Required = true, SetName = "ls")]
     public bool ls { get; set; }
 
@@ -152,15 +143,16 @@ class Options
     [Option(HelpText = "Create a directory named <path>", Required = true, SetName = "mkdir")]
     public string mkdir { get; set; }
 
-    [Option(HelpText = "Display status text of the <path>", Required = true, SetName = "echo")]
+    [Option(HelpText = "Display <value>", Required = true, SetName = "echo")]
     public IEnumerable<string> echo { get; set; }
 }
 
 [Verb("grep", HelpText = "for searching plain-text data sets for lines that match a regular expression")]
 class GrepOptions
 {
+    // -r means recursive without -r no recursive
     [Option('r', HelpText = "run recurssively", SetName = "r", Default = false)]
-    public bool reccursive { get; set; }
+    public bool recursive { get; set; }
 
     [Value(0, Required = true, HelpText = "File Search Line Pattern")]
     public string FileSearchLinePattern { get; set; }

@@ -94,47 +94,4 @@ public static class CommandPrompt
         }
         return success;
     }
-
-    public static string SearchFileContent(string path, string searchTerm)
-    {
-        try
-        {
-            string[] files = Directory.GetFiles(path);
-
-            string results = string.Empty;
-
-            foreach (string file in files)
-            {
-                string[] lines = File.ReadAllLines(file);
-
-                foreach (string line in lines)
-                {
-                    if (line.Contains(searchTerm))
-                    {
-                        results += file + ": " + line + Environment.NewLine;
-                    }
-                }
-            }
-
-            if (!string.IsNullOrEmpty(results))
-            {
-                return results;
-            }
-            else
-            {
-                return "No matching results found";
-            }
-        }
-        catch (Exception ex)
-        {
-            return "Error: " + ex.Message;
-        }
-    }
-
-    public static string Exit()
-    {
-        // You can add any necessary cleanup or finalization code here
-        Environment.Exit(0);
-        return string.Empty;
-    }
 }

@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Components.WebView.Maui;
-using LineWizard.GUI.Data;
-using MudBlazor.Services;
+﻿using MudBlazor.Services;
 
 namespace LineWizard.GUI;
 
@@ -21,7 +19,6 @@ public static class MauiProgram
 		builder.Services.AddBlazorWebViewDeveloperTools();
 #endif
 		
-		builder.Services.AddSingleton<WeatherForecastService>();
         builder.Services.AddMudServices();
         return builder.Build();
 	}
