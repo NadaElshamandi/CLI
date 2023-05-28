@@ -4,9 +4,9 @@ VisualStudioVersion = 17.0.31611.283
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LineWizard.GUI", "LineWizard.GUI\LineWizard.GUI.csproj", "{0EFC7E72-9FA9-427F-98FD-800ECF0C2E89}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LineWizard.CLI", "LineWizard.CLI\LineWizard.CLI.csproj", "{196996A8-F6B2-47C6-B511-6EC10D4771F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LineWizard.CLI", "LineWizard.CLI\LineWizard.CLI.csproj", "{196996A8-F6B2-47C6-B511-6EC10D4771F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LineWizard.Shared", "LineWizard.Shared\LineWizard.Shared.csproj", "{9A7788EB-8623-4D66-B730-41F78AF858F6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LineWizard.Shared", "LineWizard.Shared\LineWizard.Shared.csproj", "{9A7788EB-8623-4D66-B730-41F78AF858F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

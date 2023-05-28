@@ -16,13 +16,13 @@ public static class CommandPrompt
         var returnValue = new ListFilesReturn();
         foreach (string file in files)
         {
-            returnValue.files.Add(Path.GetFileName(file));
+            returnValue.files.Add(file);
         }
 
 
         foreach (string directory in directories)
         {
-            returnValue.folders.Add(Path.GetFileName(directory));
+            returnValue.folders.Add(directory);
         }
 
         return returnValue;
@@ -57,7 +57,7 @@ public static class CommandPrompt
     {
         if (!File.Exists(filePath))
         {
-            File.Create(filePath);
+            using (File.Create(filePath))
             return true;
         }
         else
@@ -71,7 +71,7 @@ public static class CommandPrompt
         if (File.Exists(sourceFilePath))
         {
             Directory.CreateDirectory(Path.GetDirectoryName(destinationFilePath) ?? "");
-            File.Copy(sourceFilePath, destinationFilePath,true);
+            File.Copy(sourceFilePath, destinationFilePath, true);
             return true;
         }
         else

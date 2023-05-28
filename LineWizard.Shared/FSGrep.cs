@@ -37,6 +37,7 @@ public static class FSGrep
 
     public static IEnumerable<Result> GetMatchingFiles(string FileSearchLinePattern, string FileSearchMask, string RootPath)
     {
+
         foreach (var filePath in GetFileNames(RootPath, FileSearchMask))
         {
             var lineNumber = 0;

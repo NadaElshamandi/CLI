@@ -1,6 +1,6 @@
 ﻿@inherits LayoutComponentBase
 
-<MudThemeProvider @bind-IsDarkMode="@themeOn"/>
+<MudThemeProvider @bind-IsDarkMode="@themeOn" />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
@@ -9,18 +9,29 @@
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudText Typo="Typo.h5" Class="ml-3">LineWizard</MudText>
         <MudSpacer />
-        <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2" Width="500px">
-        <LineWizard.GUI.Pages.FileTree/>
+        <LineWizard.GUI.Pages.FileTree TextChanged="TextChangedHandler" />
     </MudDrawer>
     <MudMainContent>
-        @*Body*@
+        <MudText Style="padding: 2rem;white-space: pre-wrap;" Typo="Typo.body1">@text</MudText>
     </MudMainContent>
 </MudLayout>
 @code {
     bool _drawerOpen = true;
     bool themeOn = true;
+    private string text = "Please select a file";
+    private void TextChangedHandler(string newText)
+    {
+        if (string.IsNullOrWhiteSpace(newText))
+        {
+            text = "This file is empty!";
+        }
+        else
+        {
+            text = newText;
+        }
+    }
 
     void DrawerToggle()
     {
