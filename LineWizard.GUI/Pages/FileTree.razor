@@ -99,7 +99,7 @@
         }
     }
 
-    public string mainPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+    public string mainPath = Environment.CurrentDirectory;
     // Navigate to the component that displays the file content
     protected override void OnInitialized()
     {
